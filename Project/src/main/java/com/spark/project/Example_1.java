@@ -21,7 +21,7 @@ public class Example_1 {
     
     public static void main(String arg[]){
         
-        List<Double> inputData= new ArrayList<>();
+        List<Double>  inputData= new ArrayList<>();
         inputData.add(35.5);
         inputData.add(122.3);
         inputData.add(32.5);
@@ -34,6 +34,11 @@ public class Example_1 {
             JavaSparkContext sc = new JavaSparkContext(conf);
 
             JavaRDD<Double> myRdd= sc.parallelize(inputData);
+            
+           Double result = myRdd.reduce((value1,value2)-> value1+value2);
+           
+            System.err.println("Result:"+result);
+            
             sc.close();
         }catch(Exception e){
             e.printStackTrace();
