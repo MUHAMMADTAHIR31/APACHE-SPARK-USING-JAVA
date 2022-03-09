@@ -1,0 +1,58 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.spark.project;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import scala.Tuple2;
+
+/**
+ *
+ * @author Dell
+ */
+public class PairRdDDExample {
+    
+    public static void main(String arg[]){
+        
+        List<String>  inputData= new ArrayList<>();
+        inputData.add("WARN: TUESDAY 4 SEPTEMBER 0405");
+        inputData.add("ERROR: TUESDAY 4 SEPTEMBER 0408");
+        inputData.add("FATAL: WEDNESDAY 5 SEPTEMBER 1632");
+        inputData.add("ERROR: FRIDAY  7 SEPTEMBER 1854");
+        inputData.add("WARN: SATURDAY 8 SEPTEMBER 1945");
+        
+        Logger.getLogger("org.apache").setLevel(Level.WARNING);
+        try{
+            SparkConf conf = new SparkConf().setAppName("startingSpark").setMaster("local[*]");
+            JavaSparkContext sc = new JavaSparkContext(conf);
+
+            
+            sc.parallelize(inputData).mapToPair( rawVallue -> new Tuple2<>(rawVallue.split(":")[0], 1L)).
+                    reduceByKey((value1,value2)-> value1+ value2).foreach(tuple -> System.out.println(tuple._1 + " has " + tuple._2 + " instances"));
+            
+//            JavaRDD<String> originalLogMessage = sc.parallelize(inputData);
+//            JavaPairRDD<String,Long> pairRdd = originalLogMessage.mapToPair( rawValue -> {
+//                String[] columns = rawValue.split(":");
+//                String level = columns[0];
+//                String date = columns[1];
+//                return new Tuple2<>(level,1L);
+//            });
+//            JavaPairRDD<String,Long> sumRdd = pairRdd.reduceByKey((value1,value2) -> value1 + value2 );  
+//            sumRdd.foreach( tuple -> System.out.println(tuple._1 + " has " + tuple._2 + " instances"));
+            
+            sc.close();
+        }catch(Exception e){
+            e.getMessage();
+            //e.printStackTrace();
+        }
+    }    
+}
